@@ -26,3 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'profile']  # Include other fields you want
+
+class PartySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Party
+        fields = ['party_name', 'party_description', 'party_location', 'party_date', 'party_time', 'user']
+        read_only_fields = ['user']  

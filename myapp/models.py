@@ -25,3 +25,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username  # or return some other identifier for the user
+    
+class Party(models.Model):
+    party_name = models.CharField(max_length=255)
+    party_description = models.TextField()
+    party_location = models.CharField(max_length=255)
+    party_date = models.CharField(max_length=255)
+    party_time = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)  # Ensure null=False is set
+
+    def __str__(self):
+        return self.party_name

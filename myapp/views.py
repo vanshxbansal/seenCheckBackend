@@ -51,6 +51,7 @@ class UserPostCreate(generics.CreateAPIView):
 
 from rest_framework import generics, status
 from rest_framework.response import Response
+    
 
 class SendEmailView(generics.CreateAPIView):
     serializer_class = EmailSerializer
@@ -162,3 +163,59 @@ class VerifyOTPView(generics.CreateAPIView):
                 return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
         except UserOTP.DoesNotExist:
             return Response({"error": "OTP not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        
+        
+from rest_framework.views import APIView
+class PartyCreateView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Get the email from the request data
+        email = request.data.get('email')
+        
+        if not email:
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find the user associated with the email
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Remove 'user' field from party data before passing to serializer
+        party_data = {key: value for key, value in request.data.items() if key != 'user'}
+
+        # Pass the updated data to the serializer
+        serializer = PartySerializer(data=party_data)
+
+        if serializer.is_valid():
+            # Manually assign the 'user' field when saving
+            party = serializer.save(user=user)  # Use the user instance here
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # Log the errors for better insight
+        print(serializer.errors)  # Debugging: This will print the specific errors in the terminal.
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class PartyByEmailView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Get the email from the URL parameters
+        email = request.query_params.get('email')
+        
+        if not email:
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find the user associated with the email
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Find all the parties associated with this user
+        parties = Party.objects.filter(user=user)
+
+        # Serialize the parties
+        serializer = PartySerializer(parties, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
