@@ -70,11 +70,14 @@ ROOT_URLCONF = 'myproject.urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',         # The database name you created
-        'USER': 'postgres',             # The user you created
-        'PASSWORD': '123456',     # The password for the user
-        'HOST': 'localhost',          # If the database is on your local machine
-        'PORT': '5432',               # Default PostgreSQL port
+        'NAME': 'postgress',
+        'USER': 'postgress_owner',
+        'PASSWORD': 'C8IT7tRZodUx',
+        'HOST': 'ep-rapid-sun-a5glpnpv.us-east-2.aws.neon.tech',
+        'PORT': '5432',  # Default PostgreSQL port
+        'OPTIONS': {
+            'sslmode': 'require',  # Enable SSL connection
+        },
     }
 }
 
